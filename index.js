@@ -6,10 +6,12 @@ const app = express();
 app.use(bodyParser.json());
 
 // 대상 서버 URL (머지된 + 라인을 전송할 엔드포인트)
-const TARGET_SERVER_URL = 'https://myserver.com/hook';
+// const TARGET_SERVER_URL = 'https://myserver.com/hook';
 
 // 깃헙에서 Webhook 호출 시 이 라우트가 실행됨
 app.post('/github-webhook', async (req, res) => {
+  console.log('req : ', req.body)
+  
   try {
     // GitHub에서 오는 이벤트 타입
     const ghEvent = req.headers['x-github-event'];
@@ -33,6 +35,8 @@ app.post('/github-webhook', async (req, res) => {
         // => 헤더에 'Accept': 'application/vnd.github.v3.diff' 를 주면 diff 형식으로 받아올 수 있음
         //    또는 commits API를 호출해도 됨
         const diffUrl = pullRequest.diff_url; 
+
+        console.log(`diff_url: ${diffUrl}`);
         // diff_url은 이미 pull_request 객체에 포함되어 있음
 
         // diff_url을 직접 요청해서 diff 텍스트를 받아옴
@@ -70,9 +74,9 @@ app.post('/github-webhook', async (req, res) => {
         };
 
         // 6) 특정 서버에 POST 요청
-        await axios.post(TARGET_SERVER_URL, payload);
+        // await axios.post(TARGET_SERVER_URL, payload);
 
-        console.log(`추출된 +라인 ${addedLines.length}개를 ${TARGET_SERVER_URL}로 전송 완료`);
+        // console.log(`추출된 +라인 ${addedLines.length}개를 ${TARGET_SERVER_URL}로 전송 완료`);
 
         // 응답
         return res.status(200).json({ message: 'OK, processed merge event' });
